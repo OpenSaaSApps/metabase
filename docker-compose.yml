@@ -1,0 +1,44 @@
+services:
+  app:
+    image: metabase/metabase:latest
+    container_name: metabase
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - MB_DB_TYPE=${{MB_DB_TYPE}}
+      - MB_DB_HOST=${{MB_DB_HOST}}
+      - MB_DB_PORT=${{MB_DB_PORT}}
+      - MB_DB_DBNAME=${{MB_DB_DBNAME}}
+      - MB_DB_USER=${{MB_DB_USER}}
+      - MB_DB_PASS=${{MB_DB_PASS}}
+      - MB_EMAIL_SMTP_HOST=${{MB_EMAIL_SMTP_HOST}}
+      - MB_EMAIL_SMTP_PORT=${{MB_EMAIL_SMTP_PORT}}
+      - MB_EMAIL_SMTP_SECURITY=${{MB_EMAIL_SMTP_SECURITY}}
+      - MB_EMAIL_SMTP_USERNAME=${{MB_EMAIL_SMTP_USERNAME}}
+      - MB_EMAIL_SMTP_PASSWORD=${{MB_EMAIL_SMTP_PASSWORD}}
+      - MB_EMAIL_FROM_ADDRESS=${{MB_EMAIL_FROM_ADDRESS}}
+    volumes:
+      - app_data:/data
+    networks:
+      - internal
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: metabase
+      POSTGRES_PASSWORD: ${MB_DB_PASS}
+      POSTGRES_DB: metabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+volumes:
+  app_data:
+
+networks:
+  internal:
